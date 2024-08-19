@@ -1,29 +1,30 @@
-version: '3.8'
+version: "3.9"
 
 services:
   db:
-    image: postgres:13
-    container_name: postgres_db
+    image: postgres:15
+    container_name: postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: Edipost
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: users
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
-  app:
+  web:
     build: .
     container_name: fastapi_app
+    command: uvicorn Back.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/Back
     ports:
       - "8000:8000"
     depends_on:
       - db
     environment:
-      DATABASE_URL: "postgresql+asyncpg://postgres:admin@db:5432/Edipost"
-    volumes:
-      - .:/app
+      DATABASE_URL: postgresql+asyncpg://postgres:admin@localhost:5432/users
 
 volumes:
   postgres_data:
